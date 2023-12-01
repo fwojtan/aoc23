@@ -1,0 +1,118 @@
+[package]
+name = "advent_of_code_template"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+itertools = "0.10.5"
+combinations="0.1.0"
+once_cell = "1.12"
+regex = "1.5.4"
+clap = { version = "4.2.5", features = ["cargo", "derive"] }
+iai = { version = "0.1.1", features = ["iai_macro", "macro"] }
+
+[[bench]]
+name = "day00"
+harness = false
+
+[[bench]]
+name = "day01"
+harness = false
+
+[[bench]]
+name = "day02"
+harness = false
+
+[[bench]]
+name = "day03"
+harness = false
+
+[[bench]]
+name = "day04"
+harness = false
+
+[[bench]]
+name = "day05"
+harness = false
+
+[[bench]]
+name = "day06"
+harness = false
+
+[[bench]]
+name = "day07"
+harness = false
+
+[[bench]]
+name = "day08"
+harness = false
+
+[[bench]]
+name = "day09"
+harness = false
+
+[[bench]]
+name = "day10"
+harness = false
+
+[[bench]]
+name = "day11"
+harness = false
+
+[[bench]]
+name = "day12"
+harness = false
+
+[[bench]]
+name = "day13"
+harness = false
+
+[[bench]]
+name = "day14"
+harness = false
+
+[[bench]]
+name = "day15"
+harness = false
+
+[[bench]]
+name = "day16"
+harness = false
+
+[[bench]]
+name = "day17"
+harness = false
+
+[[bench]]
+name = "day18"
+harness = false
+
+[[bench]]
+name = "day19"
+harness = false
+
+[[bench]]
+name = "day20"
+harness = false
+
+[[bench]]
+name = "day21"
+harness = false
+
+[[bench]]
+name = "day22"
+harness = false
+
+[[bench]]
+name = "day23"
+harness = false
+
+[[bench]]
+name = "day24"
+harness = false
+
+[[bench]]
+name = "day25"
+harness = false
