@@ -30,9 +30,14 @@ impl Solution for Day03 {
         let mut graph = Graph::<Node, (), Undirected>::new_undirected();
         let mut symbol_indexes = HashMap::new();
 
+        // Previously I allocated these where I call clear on them.
+        // Moving them out of the loop made my whole solution 11% faster
+        let mut adjacents = Vec::new(); // For collecting adjacent characters and their coords
+        let mut adjacent_node_idxs = Vec::new(); // For collecting the graph node indices of adjacent characters
+
         for (i_y, row) in grid.iter().enumerate() {
             let mut value = 0;
-            let mut adjacents = vec![];
+            adjacents.clear();
             for (i_x, character) in row.iter().enumerate() {
                 if character.is_ascii_digit() {
                     value += character.to_digit(10).unwrap();
@@ -51,7 +56,7 @@ impl Solution for Day03 {
                     if row.get(i_x + 1).is_none()
                         || row.get(i_x + 1).is_some_and(|c| !c.is_ascii_digit())
                     {
-                        let mut adjacent_idxs = vec![];
+                        adjacent_node_idxs.clear();
                         for adjacent_symbol in adjacents.iter() {
                             let index =
                                 symbol_indexes
@@ -60,14 +65,14 @@ impl Solution for Day03 {
                                         number: None,
                                         symbol: Some(*adjacent_symbol.0),
                                     }));
-                            adjacent_idxs.push(*index);
+                            adjacent_node_idxs.push(*index);
                         }
                         let number_idx = graph.add_node(Node {
                             number: Some(value),
                             symbol: None,
                         });
-                        for adj_idx in adjacent_idxs {
-                            graph.update_edge(number_idx, adj_idx, ());
+                        for adj_idx in &adjacent_node_idxs {
+                            graph.update_edge(number_idx, *adj_idx, ());
                         }
 
                         adjacents.clear();
