@@ -63,9 +63,7 @@ impl Solution for Day04 {
                     0
                 }
             })
-            .map(|i| {
-                i
-            })
+            .map(|i| i)
             .sum::<u32>()
             .to_string()
     }
