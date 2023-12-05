@@ -44,7 +44,7 @@ impl Solution for Day01 {
 
             let f = first.expect("Line must contain digit").to_string();
             let l = last.expect("Line must contain digit").to_string();
-            let value_str = vec![f, l].join("");
+            let value_str = [f, l].join("");
 
             total += value_str.parse::<u32>().expect("Value must be integer");
         }
@@ -74,7 +74,7 @@ impl Solution for Day01 {
 
             let f = first.expect("Line must contain digit").to_string();
             let l = last.expect("Line must contain digit").to_string();
-            let value_str = vec![f, l].join("");
+            let value_str = [f, l].join("");
 
             // println!("{} - {}", value_str, line);
 
