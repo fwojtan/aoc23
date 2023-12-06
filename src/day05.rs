@@ -187,7 +187,9 @@ humidity-to-location map:
 
     #[test]
     fn check_day05_part2_case1() {
-        assert_eq!(Day05::solve_part_two("seeds: 79 14 55 13
+        assert_eq!(
+            Day05::solve_part_two(
+                "seeds: 79 14 55 13
 
 seed-to-soil map:
 50 98 2
@@ -219,7 +221,10 @@ temperature-to-humidity map:
 
 humidity-to-location map:
 60 56 37
-56 93 4"), "46".to_string())
+56 93 4"
+            ),
+            "46".to_string()
+        )
     }
 
     #[test]
