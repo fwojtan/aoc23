@@ -5,7 +5,7 @@ use petgraph::{
     algo::{dijkstra, has_path_connecting},
     dot::{Config, Dot},
     stable_graph::NodeIndex,
-    visit::Bfs,
+    visit::{Bfs, EdgeRef},
     Graph, Undirected,
 };
 
@@ -29,6 +29,7 @@ impl Solution for Day10 {
         // in parts one and two or passing a tuple with the data required for each part.
 
         let mut graph = Graph::<Node, (), Undirected>::new_undirected();
+        let mut pipe_loop = Graph::<Node, (), Undirected>::new_undirected();
         let mut coord_map: HashMap<Vector2<isize>, NodeIndex> = HashMap::new();
         let mut start = None;
 
@@ -123,6 +124,7 @@ impl Solution for Day10 {
                         adj_coords.push(coord + NORTH)
                     }
                 }
+                PipeType::InLoop => panic!(),
             };
 
             for adj_coord in &adj_coords {
@@ -132,26 +134,10 @@ impl Solution for Day10 {
             }
         }
 
-        let mut connected_nodes = HashSet::new();
-        let bfs = Bfs::new(&graph, start.unwrap());
-        for node in bfs.stack.iter() {
-            connected_nodes.insert(node);
-        }
-
-        for node in graph.node_indices() {
-            if !connected_nodes.contains(&node) {
-                graph.remove_node(node);
-            }
-        }
-
         (graph, start.unwrap())
     }
 
     fn part_one(parsed_input: &mut Self::ParsedInput) -> String {
-        // println!(
-        //     "\n\n{:?}\n\n",
-        //     Dot::with_config(&parsed_input.0, &[Config::EdgeNoLabel])
-        // );
         dijkstra(&parsed_input.0, parsed_input.1, None, |_| 1)
             .into_iter()
             .map(|(_idx, dist)| dist)
@@ -160,13 +146,46 @@ impl Solution for Day10 {
             .to_string()
     }
 
-    fn part_two(_parsed_input: &mut Self::ParsedInput) -> String {
-        // TODO: implement part two
-        0.to_string()
+    fn part_two(parsed_input: &mut Self::ParsedInput) -> String {
+        let mut connected_nodes = HashSet::new();
+        let mut bfs = Bfs::new(&parsed_input.0, parsed_input.1);
+        while let Some(node_idx) = bfs.next(&parsed_input.0) {
+            connected_nodes.insert(parsed_input.0.node_weight(node_idx).unwrap());
+        }
+
+        const GRID_SIZE: usize = if !cfg!(test) { 140 } else { 5 };
+        let mut grid = [[PipeType::NotPipe; GRID_SIZE]; GRID_SIZE];
+
+        for node in connected_nodes {
+            grid[node.coord.y as usize][node.coord.x as usize] = node.pipe_type;
+        }
+
+        // Credit to reddit for helping me get this algorithm... I'd spent far too long on this puzzle already..
+        for row in grid.iter_mut() {
+            let mut currently_in_loop = false;
+            for pipe_type in row.iter_mut() {
+                match *pipe_type {
+                    PipeType::NotPipe if currently_in_loop => *pipe_type = PipeType::InLoop,
+                    PipeType::NE | PipeType::NW | PipeType::Vertical | PipeType::Unknown => {
+                        currently_in_loop = !currently_in_loop
+                    }
+                    _ => (),
+                }
+            }
+        }
+
+        for row in grid {
+            println!("{}", row.iter().map(|pt| pt.to_char()).collect::<String>());
+        }
+
+        grid.iter()
+            .map(|row| row.iter().filter(|pt| **pt == PipeType::InLoop).count())
+            .sum::<usize>()
+            .to_string()
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub struct Node {
     coord: Vector2<isize>,
     pipe_type: PipeType,
@@ -181,7 +200,7 @@ impl Node {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Copy, Hash, Eq, PartialEq)]
 pub enum PipeType {
     NotPipe,
     NE,
@@ -191,6 +210,7 @@ pub enum PipeType {
     Horizontal,
     Vertical,
     Unknown,
+    InLoop,
 }
 
 impl PipeType {
@@ -205,6 +225,20 @@ impl PipeType {
             'F' => PipeType::SE,
             'S' => PipeType::Unknown,
             input => panic!("Unexpected input char: {}", input),
+        }
+    }
+
+    fn to_char(&self) -> char {
+        match self {
+            PipeType::NotPipe => '.',
+            PipeType::NE => '└',
+            PipeType::NW => '┘',
+            PipeType::SE => '┌',
+            PipeType::SW => '┐',
+            PipeType::Horizontal => '─',
+            PipeType::Vertical => '│',
+            PipeType::Unknown => 'S',
+            PipeType::InLoop => 'x',
         }
     }
 
@@ -351,7 +385,30 @@ LJ.LJ"
 
     #[test]
     fn check_day10_part2_case1() {
-        assert_eq!(Day10::solve_part_two(""), "0".to_string())
+        assert_eq!(
+            Day10::solve_part_two(
+                "-L|F7
+7S-7|
+L|7||
+-L-J|
+L|-JF"
+            ),
+            "1".to_string()
+        )
+    }
+
+    #[test]
+    fn check_day10_part2_case2() {
+        assert_eq!(
+            Day10::solve_part_two(
+                "7-F7-
+.FJ|7
+SJLL7
+|F--J
+LJ.LJ"
+            ),
+            "1".to_string()
+        )
     }
 
     #[test]
