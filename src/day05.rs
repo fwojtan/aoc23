@@ -29,7 +29,7 @@ impl Solution for Day05 {
         for block in blocks {
             maps.push(RangeMap::new(
                 block
-                    .split("\n")
+                    .split('\n')
                     .skip(1)
                     .map(|line| {
                         line.split_ascii_whitespace()
@@ -101,24 +101,20 @@ impl RangeMap {
     }
 }
 
-fn minimum_location_for_seeds(seeds: &Vec<u64>, maps: &Vec<RangeMap>) -> u64 {
+fn minimum_location_for_seeds(seeds: &Vec<u64>, maps: &[RangeMap]) -> u64 {
     let (sender, receiver) = channel();
     let minimum_thread = std::thread::spawn(move || {
         let mut minimum = u64::MAX;
-        loop {
-            match receiver.recv() {
-                Ok(value) => {
-                    if value < minimum {
-                        minimum = value;
-                    }
-                }
-                Err(_) => break,
+        while let Ok(value) = receiver.recv() {
+            if value < minimum {
+                minimum = value;
             }
         }
+
         minimum
     });
     seeds.into_par_iter().for_each_with(sender, |s, seed| {
-        let mut current_value = seed.clone();
+        let mut current_value = *seed;
         for map in maps.iter() {
             current_value = map.get(&current_value);
         }

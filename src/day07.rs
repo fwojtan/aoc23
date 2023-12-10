@@ -1,8 +1,6 @@
-use std::{cmp, slice::Iter, str::FromStr};
+use std::{cmp, slice::Iter};
 
 use counter::Counter;
-use itertools::Itertools;
-use rayon::prelude::*;
 
 use crate::Solution;
 
@@ -199,7 +197,7 @@ impl HandType {
     }
 }
 
-fn solve(input: &mut Vec<Hand>) -> String {
+fn solve(input: &mut [Hand]) -> String {
     input.sort_by(
         |hand_a, hand_b| match hand_a.hand_type.cmp(&hand_b.hand_type) {
             cmp::Ordering::Less => cmp::Ordering::Less,

@@ -1,13 +1,7 @@
 use std::{collections::HashMap, iter::Peekable, str::Chars};
 
-use clap::parser;
 use num::Integer;
-use petgraph::{
-    stable_graph::NodeIndex,
-    visit::{EdgeRef, IntoNeighbors},
-    Directed, Graph,
-};
-use rayon::vec;
+use petgraph::{stable_graph::NodeIndex, visit::EdgeRef, Directed, Graph};
 
 use crate::Solution;
 
@@ -43,10 +37,10 @@ impl Solution for Day08 {
         for line in lines {
             let mut parser = line.chars().peekable().parser();
             let node = parser.parse_word().unwrap();
-            let _ = parser.step_over('=').unwrap();
-            let _ = parser.step_over('(').unwrap();
+            parser.step_over('=').unwrap();
+            parser.step_over('(').unwrap();
             let left = parser.parse_word().unwrap();
-            let _ = parser.step_over(',').unwrap();
+            parser.step_over(',').unwrap();
             let right = parser.parse_word().unwrap();
 
             let node_idx = *node_indices
@@ -61,7 +55,7 @@ impl Solution for Day08 {
 
             graph.add_edge(node_idx, left_idx, Direction::Left);
             graph.add_edge(node_idx, right_idx, Direction::Right);
-            if node == "AAA".to_string() {
+            if node == *"AAA" {
                 starting_index = Some(node_idx);
             }
         }
@@ -94,7 +88,7 @@ impl Solution for Day08 {
 
         let mut nodes = graph
             .node_indices()
-            .filter(|node| graph.node_weight(*node).unwrap().ends_with("A"))
+            .filter(|node| graph.node_weight(*node).unwrap().ends_with('A'))
             .collect::<Vec<_>>();
         let mut count: u64 = 0;
 
@@ -109,7 +103,7 @@ impl Solution for Day08 {
                     .find(|edge| edge.weight() == direction)
                     .map(|edge| edge.target())
                     .unwrap();
-                if graph.node_weight(*current_node_idx).unwrap().ends_with("Z") {
+                if graph.node_weight(*current_node_idx).unwrap().ends_with('Z') {
                     step_counts[i] = Some(count);
                 }
             }
@@ -165,15 +159,6 @@ impl<'a> Parser<'a> {
                 return;
             }
         }
-    }
-
-    fn skip(&mut self, n: usize) -> Result<(), ()> {
-        for _ in 0..n {
-            if self.chars.next().is_none() {
-                return Err(());
-            };
-        }
-        Ok(())
     }
 
     fn step_over(&mut self, char_to_skip: char) -> Result<(), ()> {

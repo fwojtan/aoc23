@@ -38,13 +38,9 @@ impl Solution for Day06 {
             .iter()
             .map(|(time, dist)| {
                 (0..*time)
-                    .filter_map(move |i| {
+                    .filter(move |i| {
                         let time_remaining = time - i;
-                        if time_remaining * i > *dist {
-                            Some(i)
-                        } else {
-                            None
-                        }
+                        time_remaining * i > *dist
                     })
                     .count() as u64
             })
@@ -56,13 +52,9 @@ impl Solution for Day06 {
         let time = parsed_input.1 .0;
         let dist = parsed_input.1 .1;
         (0..time)
-            .filter_map(move |i| {
+            .filter(move |i| {
                 let time_remaining = time - i;
-                if time_remaining * i > dist {
-                    Some(i)
-                } else {
-                    None
-                }
+                time_remaining * i > dist
             })
             .count()
             .to_string()
