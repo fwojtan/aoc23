@@ -1,13 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use nalgebra::Vector2;
-use petgraph::{
-    algo::{dijkstra, has_path_connecting},
-    dot::{Config, Dot},
-    stable_graph::NodeIndex,
-    visit::{Bfs, EdgeRef},
-    Graph, Undirected,
-};
+use petgraph::{algo::dijkstra, stable_graph::NodeIndex, visit::Bfs, Graph, Undirected};
 
 use crate::Solution;
 
@@ -29,7 +23,7 @@ impl Solution for Day10 {
         // in parts one and two or passing a tuple with the data required for each part.
 
         let mut graph = Graph::<Node, (), Undirected>::new_undirected();
-        let mut pipe_loop = Graph::<Node, (), Undirected>::new_undirected();
+        let _pipe_loop = Graph::<Node, (), Undirected>::new_undirected();
         let mut coord_map: HashMap<Vector2<isize>, NodeIndex> = HashMap::new();
         let mut start = None;
 
@@ -128,7 +122,7 @@ impl Solution for Day10 {
             };
 
             for adj_coord in &adj_coords {
-                if let Some(neighbour) = coord_map.get(&adj_coord) {
+                if let Some(neighbour) = coord_map.get(adj_coord) {
                     graph.update_edge(*node_idx, *neighbour, ());
                 }
             }
@@ -139,8 +133,7 @@ impl Solution for Day10 {
 
     fn part_one(parsed_input: &mut Self::ParsedInput) -> String {
         dijkstra(&parsed_input.0, parsed_input.1, None, |_| 1)
-            .into_iter()
-            .map(|(_idx, dist)| dist)
+            .into_values()
             .max()
             .unwrap()
             .to_string()
@@ -175,7 +168,10 @@ impl Solution for Day10 {
         }
 
         for row in grid {
-            println!("{}", row.iter().map(|pt| pt.to_char()).collect::<String>());
+            println!(
+                "{}",
+                row.iter().map(|pt| pt.display_char()).collect::<String>()
+            );
         }
 
         grid.iter()
@@ -228,7 +224,7 @@ impl PipeType {
         }
     }
 
-    fn to_char(&self) -> char {
+    fn display_char(&self) -> char {
         match self {
             PipeType::NotPipe => '.',
             PipeType::NE => '└',
@@ -247,10 +243,10 @@ impl PipeType {
             PipeType::NotPipe | PipeType::SE | PipeType::SW | PipeType::Horizontal => return false,
             _ => (),
         }
-        match other {
-            PipeType::NotPipe | PipeType::NE | PipeType::NW | PipeType::Horizontal => false,
-            _ => true,
-        }
+        !matches!(
+            other,
+            PipeType::NotPipe | PipeType::NE | PipeType::NW | PipeType::Horizontal
+        )
     }
 
     fn is_connected_south(&self, other: &PipeType) -> bool {
@@ -258,10 +254,10 @@ impl PipeType {
             PipeType::NotPipe | PipeType::NE | PipeType::NW | PipeType::Horizontal => return false,
             _ => (),
         }
-        match other {
-            PipeType::NotPipe | PipeType::SE | PipeType::SW | PipeType::Horizontal => false,
-            _ => true,
-        }
+        !matches!(
+            other,
+            PipeType::NotPipe | PipeType::SE | PipeType::SW | PipeType::Horizontal
+        )
     }
 
     fn is_connected_east(&self, other: &PipeType) -> bool {
@@ -269,10 +265,10 @@ impl PipeType {
             PipeType::NotPipe | PipeType::NW | PipeType::SW | PipeType::Vertical => return false,
             _ => (),
         }
-        match other {
-            PipeType::NotPipe | PipeType::NE | PipeType::SE | PipeType::Vertical => false,
-            _ => true,
-        }
+        !matches!(
+            other,
+            PipeType::NotPipe | PipeType::NE | PipeType::SE | PipeType::Vertical
+        )
     }
 
     fn is_connected_west(&self, other: &PipeType) -> bool {
@@ -280,10 +276,10 @@ impl PipeType {
             PipeType::NotPipe | PipeType::NE | PipeType::SE | PipeType::Vertical => return false,
             _ => (),
         }
-        match other {
-            PipeType::NotPipe | PipeType::NW | PipeType::SW | PipeType::Vertical => false,
-            _ => true,
-        }
+        !matches!(
+            other,
+            PipeType::NotPipe | PipeType::NW | PipeType::SW | PipeType::Vertical
+        )
     }
 }
 

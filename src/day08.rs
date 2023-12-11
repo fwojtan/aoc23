@@ -75,7 +75,7 @@ impl Solution for Day08 {
                 .find(|edge| edge.weight() == direction)
                 .map(|edge| edge.target())
                 .unwrap();
-            if *graph.node_weight(current_node_idx).unwrap() == "ZZZ".to_string() {
+            if *graph.node_weight(current_node_idx).unwrap() == "ZZZ" {
                 break;
             }
         }
